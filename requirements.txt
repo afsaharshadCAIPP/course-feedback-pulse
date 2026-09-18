@@ -23,3 +23,6 @@ sentencepiece==0.2.0
 
 # Language detection for optional NLLB translation
 langdetect==1.0.9
+
+# Explainable AI
+shap
