@@ -23,7 +23,18 @@ The application supports:
 - Explainable AI using SHAP
 - Downloadable analysis results
 
-The project combines traditional machine learning with a multilingual Transformer model to analyze feedback written in different languages.
+The project combines traditional machine learning with modern transformer architectures to analyze feedback written in different languages.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Frontend / UI:** Streamlit Cloud
+- **Machine Learning (Baseline):** Scikit-Learn (Logistic Regression for rapid classification)
+- **Deep Learning / Transformers:** Hugging Face Transformers (`DistilBERT` for advanced context-aware sentiment intelligence)
+- **Multilingual Pipeline:** NLLB (No Language Left Behind) / Hugging Face translation integration for seamless processing of Urdu, Chinese, Korean, and other non-English reviews
+- **Explainable AI:** SHAP (SHapley Additive exPlanations) for model interpretability and feature contribution insights
+- **Data Manipulation & Processing:** Pandas, NumPy
 
 ---
 
@@ -64,7 +75,7 @@ Example CSV structure:
 
 ### 🌍 Multilingual Sentiment Analysis
 
-The application is designed to process feedback in multiple languages, including:
+Powered by Hugging Face integration and translation pipelines, the application processes feedback in multiple languages, including:
 
 - English
 - Urdu
