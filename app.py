@@ -1406,7 +1406,7 @@ def predict_combined_batch(texts):
 
 def predict_sentiment(text, model_name):
     if model_name == "Logistic Regression":
-        return predict_logistic(text)
+        getattr(model, 'multi_class', 'auto')
     if model_name == "DistilBERT":
         return predict_distilbert(text)
     return predict_combined(text)
