@@ -67,7 +67,7 @@ section[data-testid="stSidebar"] * { color: #E5E7EB; }
     background: #17233F; display:flex; align-items:center; justify-content:center;
     font-size: 28px; margin-bottom: 0.6rem;
 }
-.sidebar-title { font-size: 1.3rem; font-weight: 800; color: #FFFFFF; line-height:1.2; margin-bottom: 0.4rem;}
+.sidebar-title { font-size: 1.25rem; font-weight: 800; color: #FFFFFF; line-height:1.2; margin-bottom: 0.4rem;}
 .sidebar-sub { font-size: 0.85rem; color: #9CA3AF; margin-bottom: 0.35rem; }
 .sidebar-author { font-size: 0.82rem; color: #93A3B8; margin-bottom: 0.8rem; }
 .sidebar-divider { border-top: 1px solid #1F2E4D; margin: 0.7rem 0 0.9rem 0; }
@@ -163,11 +163,20 @@ def get_word_contributions(text, pred_label):
     contrib_df = contrib_df.reindex(contrib_df["Contribution"].abs().sort_values(ascending=False).index)
     return contrib_df.reset_index(drop=True)
 
+LANG_MAP_CODES = {
+    "English": "en",
+    "Chinese (中文)": "zh-cn",
+    "Urdu (اردو)": "ur",
+    "Spanish (Español)": "es",
+    "French (Français)": "fr",
+    "German (Deutsch)": "de",
+    "Arabic (العربية)": "ar"
+}
+
 LANG_NAMES = {
     "en": "English", "ur": "Urdu", "zh-cn": "Chinese", "zh": "Chinese", "ko": "Korean",
     "ru": "Russian", "es": "Spanish", "fr": "French", "de": "German", "hi": "Hindi",
     "ar": "Arabic", "pt": "Portuguese", "ja": "Japanese", "it": "Italian", "tr": "Turkish",
-    "id": "Indonesian", "vi": "Vietnamese", "bn": "Bengali", "fa": "Persian", "nl": "Dutch",
 }
 
 def detect_language(text):
@@ -209,7 +218,6 @@ ASPECT_KEYWORDS = {
     "Relevance": ["relevant", "relevance", "up-to-date", "up to date", "outdated", "current", "industry"],
     "Overall Experience": ["overall", "experience", "satisfied", "satisfaction", "enjoyed", "enjoy", "recommend", "recommended", "great course", "amazing"],
 }
-ASPECT_NAMES = list(ASPECT_KEYWORDS.keys())
 ASPECT_ICONS = {
     "Course Content": "📖", "Instructor": "👤", "Assignments": "📋",
     "Quizzes & Assessments": "📝", "Difficulty": "🎯", "Learning Experience": "🎓",
@@ -235,7 +243,6 @@ def extract_aspect_mentions(text):
     return found
 
 REVIEW_COL_CANDIDATES = ["feedback", "review", "reviews", "text", "comment", "comments", "description", "student_feedback"]
-COURSE_COL_CANDIDATES = ["course", "courseid", "course_id", "coursename", "course_name", "coursetitle"]
 
 def detect_review_column(df):
     cols_lower = {c.lower().strip(): c for c in df.columns}
@@ -246,16 +253,6 @@ def detect_review_column(df):
     if not obj_cols:
         return df.columns[0]
     return max(obj_cols, key=lambda c: df[c].astype(str).str.len().mean())
-
-def detect_course_column(df, review_col):
-    cols_lower = {c.lower().strip(): c for c in df.columns}
-    for cand in COURSE_COL_CANDIDATES:
-        if cand in cols_lower:
-            return cols_lower[cand]
-    for c in df.columns:
-        if c != review_col and df[c].dtype == object:
-            return c
-    return None
 
 def df_to_csv_bytes(df):
     return df.to_csv(index=False).encode("utf-8-sig")
@@ -349,15 +346,20 @@ with st.sidebar:
 app_mode = st.session_state.nav
 
 # =============================================================
-# SAMPLE FEEDBACKS & FULL MODEL DESCRIPTIONS
+# SAMPLE FEEDBACKS & FULL MODEL DESCRIPTIONS (Expanded Options)
 # =============================================================
 SAMPLE_FEEDBACKS = {
     "Choose a feedback...": "",
-    "Excellent course": "This course is excellent and very easy to follow. I learned a lot.",
-    "Very helpful": "The explanations are clear and the practice was very useful.",
-    "Good but difficult": "The instructor was good and the content was useful, but some assignments were difficult.",
-    "Average experience": "The course was okay, but some topics needed more examples.",
-    "Poor experience": "The lessons were confusing and the exercises were too hard.",
+    "⭐ Excellent course (English)": "This course is excellent and very easy to follow. I learned a lot.",
+    "👍 Very helpful explanations (English)": "The explanations are clear and the practice was very useful.",
+    "⚖️ Good content, hard assignments (English)": "The instructor was good and the content was useful, but some assignments were difficult.",
+    "😐 Average experience (English)": "The course was okay, but some topics needed more examples.",
+    "❌ Poor experience (English)": "The lessons were confusing and the exercises were too hard.",
+    "🌟 Excellent instructor (English)": "The instructor explained everything clearly and the lectures were engaging.",
+    "🇨🇳 Chinese review (中文)": "这门课程非常棒，老师讲解得很清楚，我学到了很多东西。",
+    "🇪🇸 Spanish review (Español)": "Este curso es excelente y muy fácil de seguir. Aprendí mucho.",
+    "🇵🇰 Urdu review (اردو)": "Yeh course bohot acha hai aur instructor ne bohat behtareen tareeqay se parhaya.",
+    "🇫🇷 French review (Français)": "Ce cours est excellent et très facile à suivre. J'ai beaucoup appris."
 }
 
 MODEL_DESCRIPTIONS = {
@@ -383,9 +385,9 @@ def update_text_from_sample():
 if app_mode == "Single Review Analysis":
     render_hero()
     st.markdown('<p class="section-header">💬 Single Review Analysis</p>', unsafe_allow_html=True)
-    st.caption("Select a sample feedback from the dropdown to auto-fill the text box, or type directly.")
+    st.caption("Select a sample feedback from the dropdown to auto-fill, choose input language, or type directly.")
 
-    col_sample, col_box = st.columns(2)
+    col_sample, col_lang = st.columns([2, 1])
     with col_sample:
         st.selectbox(
             "Select Sample Feedback (Auto-fetches)", 
@@ -393,13 +395,18 @@ if app_mode == "Single Review Analysis":
             key="sample_dropdown", 
             on_change=update_text_from_sample
         )
-    with col_box:
-        user_review = st.text_area(
-            "Review Text", 
-            max_chars=1000, 
-            key="review_input_text", 
-            placeholder="Review text will appear here automatically when selected from the dropdown..."
+    with col_lang:
+        selected_lang_option = st.selectbox(
+            "Input Language Function",
+            ["Auto-Detect", "English", "Chinese (中文)", "Urdu (اردو)", "Spanish (Español)", "French (Français)"]
         )
+
+    user_review = st.text_area(
+        "Review Text", 
+        max_chars=1000, 
+        key="review_input_text", 
+        placeholder="Review text will appear here automatically when selected from the dropdown..."
+    )
 
     st.markdown("")
     st.markdown("### Select Backend Model")
@@ -425,8 +432,14 @@ if app_mode == "Single Review Analysis":
             st.warning("Please enter or select a review text first.")
         else:
             with st.spinner(f"Running inference using **{selected_model}**..."):
-                lang_code, lang_name = detect_language(user_review)
-                translated = translate_to_english(user_review, lang_code)
+                if selected_lang_option != "Auto-Detect":
+                    lang_code = LANG_MAP_CODES.get(selected_lang_option, "en")
+                    lang_name = selected_lang_option
+                    translated = translate_to_english(user_review, lang_code)
+                else:
+                    lang_code, lang_name = detect_language(user_review)
+                    translated = translate_to_english(user_review, lang_code)
+
                 probs = get_full_probs(translated)
                 sentiment = max(probs, key=probs.get)
                 conf = probs[sentiment]
@@ -445,8 +458,8 @@ if app_mode == "Single Review Analysis":
                             st.markdown(f"{cls.capitalize()}&nbsp;&nbsp;&nbsp;**{p*100:.0f}%**", unsafe_allow_html=True)
                             st.progress(float(p))
 
-                if lang_code != "en":
-                    st.info(f"🌍 **Detected Language:** {lang_name}  \n**English Translated Text:** {translated}")
+                if lang_code != "en" or selected_lang_option != "Auto-Detect":
+                    st.info(f"🌍 **Language / Translation:** {lang_name}  \n**English Translated Text:** {translated}")
 
                 st.markdown('<p class="section-header">🔗 Aspect-Based Breakdown</p>', unsafe_allow_html=True)
                 mentions = extract_aspect_mentions(translated)
