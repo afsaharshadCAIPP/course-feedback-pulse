@@ -56,19 +56,6 @@ st.markdown("""
 .model-desc-box .model-desc-title { font-weight:800; color:#1D4ED8; margin-bottom:0.25rem; }
 .model-desc-box .model-desc-body { color:#1D4ED8; font-size:0.88rem; line-height:1.45; }
 
-.highlight-box {
-    background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px;
-    padding:1rem 1.2rem; color:#1D4ED8;
-}
-.highlight-box b { color:#1D4ED8; }
-
-.pill {
-    display:inline-block; border:1px solid #D1D5DB; border-radius:8px;
-    padding:0.35rem 0.8rem; margin:0.2rem; font-size:0.92rem; color:#111827;
-}
-
-.check-row { padding:0.6rem 0; border-bottom:1px solid #F1F5F9; }
-
 section[data-testid="stSidebar"] {
     background-color: #0B1B38;
 }
@@ -80,9 +67,9 @@ section[data-testid="stSidebar"] * { color: #E5E7EB; }
     background: #17233F; display:flex; align-items:center; justify-content:center;
     font-size: 28px; margin-bottom: 0.6rem;
 }
-.sidebar-title { font-size: 1.45rem; font-weight: 800; color: #FFFFFF; line-height:1.25; margin-bottom: 0.4rem;}
-.sidebar-sub { font-size: 0.92rem; color: #9CA3AF; margin-bottom: 0.35rem; }
-.sidebar-author { font-size: 0.88rem; color: #93A3B8; margin-bottom: 0.8rem; }
+.sidebar-title { font-size: 1.3rem; font-weight: 800; color: #FFFFFF; line-height:1.2; margin-bottom: 0.4rem;}
+.sidebar-sub { font-size: 0.85rem; color: #9CA3AF; margin-bottom: 0.35rem; }
+.sidebar-author { font-size: 0.82rem; color: #93A3B8; margin-bottom: 0.8rem; }
 .sidebar-divider { border-top: 1px solid #1F2E4D; margin: 0.7rem 0 0.9rem 0; }
 
 section[data-testid="stSidebar"] div.stButton > button {
@@ -92,23 +79,19 @@ section[data-testid="stSidebar"] div.stButton > button {
     border: none;
     background-color: #14213F;
     color: #E5E7EB !important;
-    padding: 0.65rem 0.9rem;
-    margin-bottom: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.4rem;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     box-shadow: none;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
     background-color: #1D2E52;
     color: #FFFFFF !important;
-    border: none;
 }
 section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
     background-color: #3B82F6 !important;
     color: #FFFFFF !important;
-}
-section[data-testid="stSidebar"] div.stButton > button[kind="primary"]:hover {
-    background-color: #2563EB !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -148,11 +131,9 @@ def batch_predict(texts):
     except Exception:
         return np.array(["NEUTRAL"] * len(clean)), np.array([0.5] * len(clean))
 
-
 def predict_sentiment(text, model_type="Combined"):
     preds, confs = batch_predict([text])
     return preds[0], float(confs[0])
-
 
 def get_full_probs(text):
     if not MODEL_READY or not text.strip():
@@ -165,7 +146,6 @@ def get_full_probs(text):
         return {cls: float(probs[classes.index(cls)]) for cls in SENT_ORDER}
     except Exception:
         return {"POSITIVE": 1/3, "NEUTRAL": 1/3, "NEGATIVE": 1/3}
-
 
 def get_word_contributions(text, pred_label):
     if not MODEL_READY:
@@ -183,7 +163,6 @@ def get_word_contributions(text, pred_label):
     contrib_df = contrib_df.reindex(contrib_df["Contribution"].abs().sort_values(ascending=False).index)
     return contrib_df.reset_index(drop=True)
 
-
 LANG_NAMES = {
     "en": "English", "ur": "Urdu", "zh-cn": "Chinese", "zh": "Chinese", "ko": "Korean",
     "ru": "Russian", "es": "Spanish", "fr": "French", "de": "German", "hi": "Hindi",
@@ -198,7 +177,6 @@ def detect_language(text):
     except Exception:
         return "unknown", "Unknown"
 
-
 def translate_to_english(text, lang_code):
     if not text or not text.strip():
         return text
@@ -210,7 +188,6 @@ def translate_to_english(text, lang_code):
         return GoogleTranslator(source="auto", target="en").translate(text)
     except Exception:
         return text
-
 
 # =============================================================
 # ASPECT KEYWORDS & UTILS
@@ -257,8 +234,8 @@ def extract_aspect_mentions(text):
                 break
     return found
 
-REVIEW_COL_CANDIDATES = ["feedback", "review", "reviews", "text", "comment", "comments", "description", "student_feedback", "student review", "student_review"]
-COURSE_COL_CANDIDATES = ["course", "courseid", "course_id", "coursename", "course_name", "course title", "coursetitle", "course_title", "course name"]
+REVIEW_COL_CANDIDATES = ["feedback", "review", "reviews", "text", "comment", "comments", "description", "student_feedback"]
+COURSE_COL_CANDIDATES = ["course", "courseid", "course_id", "coursename", "course_name", "coursetitle"]
 
 def detect_review_column(df):
     cols_lower = {c.lower().strip(): c for c in df.columns}
@@ -279,12 +256,6 @@ def detect_course_column(df, review_col):
         if c != review_col and df[c].dtype == object:
             return c
     return None
-
-def fig_to_png_bytes(fig):
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
-    buf.seek(0)
-    return buf
 
 def df_to_csv_bytes(df):
     return df.to_csv(index=False).encode("utf-8-sig")
@@ -363,8 +334,8 @@ if "nav" not in st.session_state:
 
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🎓</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-title">Course Feedback<br>Sentiment Analysis</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-sub">AI-Powered Insights for Better Learning</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-title">Course Feedback Sentiment Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-sub">AI-Powered Insights</div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-author">Created By Afsah Arshad</div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
@@ -387,8 +358,6 @@ SAMPLE_FEEDBACKS = {
     "Good but difficult": "The instructor was good and the content was useful, but some assignments were difficult.",
     "Average experience": "The course was okay, but some topics needed more examples.",
     "Poor experience": "The lessons were confusing and the exercises were too hard.",
-    "Excellent instructor": "The instructor explained everything clearly and the lectures were engaging.",
-    "Difficult assignments": "The assignments were too difficult and took much longer than expected.",
 }
 
 MODEL_DESCRIPTIONS = {
@@ -400,14 +369,13 @@ MODEL_DESCRIPTIONS = {
         "Combines traditional TF-IDF Logistic Regression with Multilingual DistilBERT, averaging probability outputs for optimal accuracy."),
 }
 
-# Session state initialization for auto-fetching single review text
-if "single_review_text" not in st.session_state:
-    st.session_state["single_review_text"] = "The instructor was good and the content was useful, but some assignments were difficult."
+if "review_input_text" not in st.session_state:
+    st.session_state["review_input_text"] = "The instructor was good and the content was useful, but some assignments were difficult."
 
-def _apply_sample_feedback():
-    choice = st.session_state.get("sample_choice")
-    if choice and SAMPLE_FEEDBACKS.get(choice):
-        st.session_state["single_review_text"] = SAMPLE_FEEDBACKS[choice]
+def update_text_from_sample():
+    selected_key = st.session_state.sample_dropdown
+    if selected_key and selected_key in SAMPLE_FEEDBACKS and SAMPLE_FEEDBACKS[selected_key]:
+        st.session_state["review_input_text"] = SAMPLE_FEEDBACKS[selected_key]
 
 # =============================================================
 # VIEW: SINGLE REVIEW ANALYSIS
@@ -415,15 +383,23 @@ def _apply_sample_feedback():
 if app_mode == "Single Review Analysis":
     render_hero()
     st.markdown('<p class="section-header">💬 Single Review Analysis</p>', unsafe_allow_html=True)
-    st.caption("Analyze single course reviews with auto-fetching sample dropdowns or manual text entry.")
+    st.caption("Select a sample feedback from the dropdown to auto-fill the text box, or type directly.")
 
-    sample_col, text_col = st.columns(2)
-    with sample_col:
-        st.selectbox("Select a sample feedback (Auto-fetches into text area)", list(SAMPLE_FEEDBACKS.keys()),
-                     key="sample_choice", on_change=_apply_sample_feedback)
-    with text_col:
-        user_review = st.text_area("Type or paste review text", max_chars=1000,
-                                    key="single_review_text", placeholder="Type or select from sample above...")
+    col_sample, col_box = st.columns(2)
+    with col_sample:
+        st.selectbox(
+            "Select Sample Feedback (Auto-fetches)", 
+            list(SAMPLE_FEEDBACKS.keys()), 
+            key="sample_dropdown", 
+            on_change=update_text_from_sample
+        )
+    with col_box:
+        user_review = st.text_area(
+            "Review Text", 
+            max_chars=1000, 
+            key="review_input_text", 
+            placeholder="Review text will appear here automatically when selected from the dropdown..."
+        )
 
     st.markdown("")
     st.markdown("### Select Backend Model")
@@ -446,7 +422,7 @@ if app_mode == "Single Review Analysis":
 
     if analyze_clicked:
         if not user_review.strip():
-            st.warning("Please enter some review text first.")
+            st.warning("Please enter or select a review text first.")
         else:
             with st.spinner(f"Running inference using **{selected_model}**..."):
                 lang_code, lang_name = detect_language(user_review)
@@ -470,13 +446,13 @@ if app_mode == "Single Review Analysis":
                             st.progress(float(p))
 
                 if lang_code != "en":
-                    st.info(f"🌍 **Detected Language (NLLB / Translation):** {lang_name}  \n**English Translated Text:** {translated}")
+                    st.info(f"🌍 **Detected Language:** {lang_name}  \n**English Translated Text:** {translated}")
 
                 st.markdown('<p class="section-header">🔗 Aspect-Based Breakdown</p>', unsafe_allow_html=True)
                 mentions = extract_aspect_mentions(translated)
                 render_aspect_cards(mentions)
 
-                shap_fig = render_explainable_section(translated, sentiment)
+                render_explainable_section(translated, sentiment)
     render_footer()
 
 # =============================================================
@@ -497,10 +473,7 @@ elif app_mode == "CSV Analysis":
 
         if df is not None and not df.empty:
             review_col = detect_review_column(df)
-            course_col = detect_course_column(df, review_col)
             st.success(f"Detected review column: **{review_col}**")
-
-            selected_model = st.radio("Select Model for Batch Processing", list(MODEL_DESCRIPTIONS.keys()), horizontal=True)
 
             if st.button("🔍 Run Batch Analysis", type="primary", use_container_width=True):
                 with st.spinner("Processing batch records..."):
@@ -509,13 +482,13 @@ elif app_mode == "CSV Analysis":
                     preds, confs = batch_predict(texts)
                     work_df["Sentiment"] = preds
                     work_df["Confidence"] = np.round(confs, 4)
-                    st.session_state["csv_result"] = {"df": work_df, "review_col": review_col, "course_col": course_col}
+                    st.session_state["csv_result"] = {"df": work_df}
                 st.success("Analysis complete!")
 
     result = st.session_state.get("csv_result")
     if result is not None:
         work_df = result["df"]
-        st.markdown('<p class="section-header">📊 Overall Sentiment Distribution (Pie Chart & Bar Chart)</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-header">📊 Overall Sentiment Distribution</p>', unsafe_allow_html=True)
         counts = work_df["Sentiment"].value_counts().reindex(SENT_ORDER, fill_value=0)
 
         c1, c2 = st.columns(2)
@@ -541,7 +514,7 @@ elif app_mode == "CSV Analysis":
 elif app_mode == "Aspect Analysis":
     render_hero()
     st.markdown('<p class="main-header">🔗 Detailed Aspect Analysis</p>', unsafe_allow_html=True)
-    text = st.text_area("Enter course feedback for aspect analysis", placeholder="The instructor was fantastic, but the course structure needs improvement.")
+    text = st.text_area("Enter course feedback for aspect analysis", value="The instructor was fantastic, but the course structure needs improvement.")
     if st.button("🔎 Extract Aspects", type="primary"):
         if text.strip():
             mentions = extract_aspect_mentions(text)
@@ -551,13 +524,12 @@ elif app_mode == "Aspect Analysis":
     render_footer()
 
 # =============================================================
-# VIEW: MODEL EVALUATION & METRICS (Confusion Matrix & Classification Report)
+# VIEW: MODEL EVALUATION & METRICS
 # =============================================================
 elif app_mode == "Model Evaluation & Metrics":
     render_hero()
     st.markdown('<p class="main-header">📊 Comprehensive Model Evaluation & Visuals</p>', unsafe_allow_html=True)
-    st.markdown("Detailed classification performance metrics, classification report summary, and Confusion Matrix visualizations.")
-
+    
     m1, m2, m3 = st.columns(3)
     m1.metric("Overall Model Accuracy", "94.8%", "+1.4%")
     m2.metric("Macro F1-Score", "0.93", "+0.03")
@@ -565,7 +537,6 @@ elif app_mode == "Model Evaluation & Metrics":
 
     st.markdown("---")
     st.markdown('<p class="section-header">Confusion Matrix Heatmap</p>', unsafe_allow_html=True)
-    
     cm_data = np.array([[120, 8, 4], [6, 140, 10], [5, 7, 135]])
     fig_cm, ax_cm = plt.subplots(figsize=(7, 5))
     sns.heatmap(cm_data, annot=True, fmt="d", cmap="Blues", xticklabels=SENT_ORDER, yticklabels=SENT_ORDER, ax=ax_cm)
@@ -592,9 +563,7 @@ elif app_mode == "Model Evaluation & Metrics":
 elif app_mode == "Explainable AI (SHAP)":
     render_hero()
     st.markdown('<p class="main-header">💡 Explainable AI / SHAP Explainer</p>', unsafe_allow_html=True)
-    st.caption("Inspect token/word impact values driving model predictions.")
-
-    text = st.text_area("Enter review for explanation", "The course material was exceptionally clear and helpful.")
+    text = st.text_area("Enter review for explanation", value="The course material was exceptionally clear and helpful.")
     if st.button("🎨 Generate SHAP Breakdown", type="primary"):
         if text.strip() and MODEL_READY:
             pred_label, conf = predict_sentiment(text)
@@ -611,5 +580,4 @@ elif app_mode == "About":
     render_hero()
     st.markdown('<p class="main-header">ℹ️ About This Project</p>', unsafe_allow_html=True)
     st.write("Course Feedback Sentiment Analyzer built with Streamlit, TF-IDF, Logistic Regression, and Multilingual DistilBERT capabilities.")
-    st.markdown('<div class="highlight-box"><b>Created By Afsah Arshad</b></div>', unsafe_allow_html=True)
     render_footer()
