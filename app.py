@@ -5,7 +5,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+import altair as alt
 from langdetect import detect, DetectorFactory
 
 DetectorFactory.seed = 0
@@ -32,7 +32,7 @@ SENT_EMOJI = {"POSITIVE": "😊", "NEUTRAL": "😐", "NEGATIVE": "😟"}
 SENT_DOT = {"POSITIVE": "🟢", "NEUTRAL": "🟡", "NEGATIVE": "🔴"}
 
 # =============================================================
-# GLOBAL STYLE
+# GLOBAL STYLE & SIDEBAR ALIGNMENT
 # =============================================================
 st.markdown("""
 <style>
@@ -41,34 +41,34 @@ st.markdown("""
 .section-header { font-size: 1.8rem !important; font-weight: 800 !important; color: #0F172A !important; margin: 1.2rem 0 0.3rem 0 !important; line-height: 1.25 !important; }
 .app-footer { text-align:center; color:#6B7280; font-size:0.85rem; margin-top:2.5rem; padding-top:1rem; border-top:1px solid #E5E7EB; }
 
+/* Sidebar styling matching standard video layout */
 section[data-testid="stSidebar"] {
     background-color: #0B1B38;
+    padding-top: 1rem;
 }
-section[data-testid="stSidebar"] > div { padding-top: 1rem; }
-section[data-testid="stSidebar"] * { color: #E5E7EB; }
+section[data-testid="stSidebar"] * { color: #E5E7EB !important; }
 
 .sidebar-logo {
-    width: 56px; height: 56px; border-radius: 14px;
+    width: 48px; height: 48px; border-radius: 12px;
     background: #17233F; display:flex; align-items:center; justify-content:center;
-    font-size: 28px; margin-bottom: 0.6rem;
+    font-size: 24px; margin-bottom: 0.5rem;
 }
-.sidebar-title { font-size: 1.25rem; font-weight: 800; color: #FFFFFF; line-height:1.2; margin-bottom: 0.4rem;}
-.sidebar-sub { font-size: 0.85rem; color: #9CA3AF; margin-bottom: 0.35rem; }
-.sidebar-author { font-size: 0.82rem; color: #93A3B8; margin-bottom: 0.8rem; }
-.sidebar-divider { border-top: 1px solid #1F2E4D; margin: 0.7rem 0 0.9rem 0; }
+.sidebar-title { font-size: 1.15rem; font-weight: 800; color: #FFFFFF; line-height:1.2; margin-bottom: 0.3rem;}
+.sidebar-sub { font-size: 0.8rem; color: #9CA3AF; margin-bottom: 0.3rem; }
+.sidebar-author { font-size: 0.78rem; color: #93A3B8; margin-bottom: 0.6rem; }
+.sidebar-divider { border-top: 1px solid #1F2E4D; margin: 0.6rem 0 0.8rem 0; }
 
 section[data-testid="stSidebar"] div.stButton > button {
     width: 100%;
     text-align: left;
-    border-radius: 10px;
+    border-radius: 8px;
     border: none;
     background-color: #14213F;
     color: #E5E7EB !important;
-    padding: 0.6rem 0.8rem;
-    margin-bottom: 0.4rem;
+    padding: 0.5rem 0.7rem;
+    margin-bottom: 0.3rem;
     font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: none;
+    font-size: 0.85rem;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
     background-color: #1D2E52;
@@ -82,7 +82,7 @@ section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
 """, unsafe_allow_html=True)
 
 # =============================================================
-# MODEL LOADING (Exact Video Model Names)
+# MODEL LOADING
 # =============================================================
 @st.cache_resource
 def load_models():
@@ -156,9 +156,6 @@ def translate_to_english(text, lang_choice):
     except Exception:
         return text
 
-# =============================================================
-# SUGGESTIONS FOR IMPROVEMENT LOGIC
-# =============================================================
 def get_improvement_suggestion(sentiment):
     if sentiment == "POSITIVE":
         return "✅ **Status:** Students are happy with the course content and teaching style. Maintain current structure."
@@ -184,7 +181,7 @@ def render_footer():
     st.markdown('<div class="app-footer">🎓 Coursera Review Sentiment Analysis • Created By Afsah Arshad</div>', unsafe_allow_html=True)
 
 # =============================================================
-# SIDEBAR NAVIGATION (Video Standard Names)
+# SIDEBAR NAVIGATION
 # =============================================================
 NAV_ITEMS = [
     ("Single Review Analysis", "💬"),
@@ -337,34 +334,34 @@ elif app_mode == "Batch Prediction (CSV)":
 
         st.markdown("---")
         
-        # Plotly Pie Chart (Fixed overlap issue completely with interactive hover & clear layout)
         col_chart1, col_chart2 = st.columns(2)
+        chart_data = res_df["Sentiment"].value_counts().reset_index()
+        chart_data.columns = ["Sentiment", "Count"]
+
         with col_chart1:
-            st.markdown("#### 🥧 Sentiment Distribution (Pie Chart)")
-            pie_data = res_df["Sentiment"].value_counts().reset_index()
-            pie_data.columns = ["Sentiment", "Count"]
-            fig_pie = px.pie(
-                pie_data, 
-                names="Sentiment", 
-                values="Count", 
-                color="Sentiment",
-                color_discrete_map=SENT_COLORS,
-                hole=0.4
-            )
-            fig_pie.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=350)
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.markdown("#### 🥧 Sentiment Distribution")
+            pie_chart = alt.Chart(chart_data).mark_arc(innerRadius=50).encode(
+                theta=alt.Theta(field="Count", type="quantitative"),
+                color=alt.Color(field="Sentiment", type="nominal", scale=alt.Scale(
+                    domain=["POSITIVE", "NEUTRAL", "NEGATIVE"],
+                    range=["#22C55E", "#F5C518", "#DC2626"]
+                )),
+                tooltip=["Sentiment", "Count"]
+            ).properties(height=300)
+            st.altair_chart(pie_chart, use_container_width=True)
 
         with col_chart2:
-            st.markdown("#### 📊 Sentiment Counts (Bar Chart)")
-            fig_bar = px.bar(
-                pie_data, 
-                x="Sentiment", 
-                y="Count", 
-                color="Sentiment",
-                color_discrete_map=SENT_COLORS
-            )
-            fig_bar.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=350, showlegend=False)
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.markdown("#### 📊 Sentiment Counts")
+            bar_chart = alt.Chart(chart_data).mark_bar().encode(
+                x=alt.X("Sentiment:N", sort=["POSITIVE", "NEUTRAL", "NEGATIVE"]),
+                y=alt.Y("Count:Q"),
+                color=alt.Color("Sentiment:N", scale=alt.Scale(
+                    domain=["POSITIVE", "NEUTRAL", "NEGATIVE"],
+                    range=["#22C55E", "#F5C518", "#DC2626"]
+                )),
+                tooltip=["Sentiment", "Count"]
+            ).properties(height=300)
+            st.altair_chart(bar_chart, use_container_width=True)
 
         st.markdown("---")
         st.markdown("#### 📋 Processed Data Table")
