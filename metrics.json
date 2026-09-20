@@ -1,0 +1,75 @@
+{
+  "dataset": "Coursera Course Reviews",
+  "dataset_size_after_cleaning": 137301,
+  "label_source": "Derived from Rating: 1-2=NEGATIVE, 3=NEUTRAL, 4-5=POSITIVE",
+  "labels": [
+    "NEGATIVE",
+    "NEUTRAL",
+    "POSITIVE"
+  ],
+  "confusion_matrix": [
+    [
+      635,
+      336,
+      113
+    ],
+    [
+      327,
+      579,
+      278
+    ],
+    [
+      1004,
+      2656,
+      21533
+    ]
+  ],
+  "classification_report": {
+    "NEGATIVE": {
+      "precision": 0.3229908443540183,
+      "recall": 0.5857933579335793,
+      "f1-score": 0.4163934426229508,
+      "support": 1084.0
+    },
+    "NEUTRAL": {
+      "precision": 0.16213945673480817,
+      "recall": 0.4890202702702703,
+      "f1-score": 0.24353312302839117,
+      "support": 1184.0
+    },
+    "POSITIVE": {
+      "precision": 0.982165663200146,
+      "recall": 0.8547215496368039,
+      "f1-score": 0.9140225396353757,
+      "support": 25193.0
+    },
+    "accuracy": 0.8283383707803794,
+    "macro avg": {
+      "precision": 0.4890986547629908,
+      "recall": 0.6431783926135511,
+      "f1-score": 0.5246497017622392,
+      "support": 27461.0
+    },
+    "weighted avg": {
+      "precision": 0.920789291906888,
+      "recall": 0.8283383707803794,
+      "f1-score": 0.8654704326318384,
+      "support": 27461.0
+    }
+  },
+  "accuracy": 0.8283383707803794,
+  "model": "TF-IDF + Logistic Regression",
+  "train_test_split": "80/20",
+  "random_state": 42,
+  "tfidf_parameters": {
+    "max_features": 10000,
+    "ngram_range": "(1, 2)",
+    "stop_words": "english",
+    "min_df": 2
+  },
+  "logistic_regression_parameters": {
+    "max_iter": 1000,
+    "class_weight": "balanced"
+  },
+  "note": "Metrics were calculated from the real Coursera course review dataset. No evaluation numbers are hardcoded."
+}

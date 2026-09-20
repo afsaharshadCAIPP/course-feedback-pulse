@@ -1,0 +1,73 @@
+{
+    "model": "distilbert-base-multilingual-cased",
+    "max_length": 128,
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "train_batch_size": 16,
+    "eval_batch_size": 32,
+    "dataset_size": 123240,
+    "train_size": 98592,
+    "validation_size": 12324,
+    "test_size": 12324,
+    "class_names": [
+        "negative",
+        "neutral",
+        "positive"
+    ],
+    "class_weights": [
+        7.802469135802469,
+        7.173979480462781,
+        0.3659728950211027
+    ],
+    "validation_results": {
+        "eval_loss": 1.1348156929016113,
+        "eval_accuracy": 0.9285134696527102,
+        "eval_f1_macro": 0.6737024735417019,
+        "eval_precision_macro": 0.674497258002228,
+        "eval_recall_macro": 0.6756946654995449
+    },
+    "test_results": {
+        "test_loss": 1.1776647567749023,
+        "test_accuracy": 0.9290814670561506,
+        "test_f1_macro": 0.6590126873521455,
+        "test_precision_macro": 0.6644015138030127,
+        "test_recall_macro": 0.6541343493427187
+    },
+    "per_class_metrics": {
+        "negative": {
+            "precision": 0.6531440162271805,
+            "recall": 0.6110056925996205,
+            "f1": 0.6313725490196078,
+            "support": 527
+        },
+        "neutral": {
+            "precision": 0.3696763202725724,
+            "recall": 0.3793706293706294,
+            "f1": 0.3744607420189819,
+            "support": 572
+        },
+        "positive": {
+            "precision": 0.9703842049092849,
+            "recall": 0.9720267260579064,
+            "f1": 0.9712047710178469,
+            "support": 11225
+        }
+    },
+    "confusion_matrix": [
+        [
+            322,
+            122,
+            83
+        ],
+        [
+            105,
+            217,
+            250
+        ],
+        [
+            66,
+            248,
+            10911
+        ]
+    ]
+}
