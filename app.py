@@ -984,7 +984,7 @@ elif app_mode == "CSV Analysis":
         courses_list = work_df[course_col].astype(str).tolist() if course_col else None
         texts_ = work_df[review_col].astype(str).tolist()
 
-        aspect_df = build_aspect_table(tuple(texts_], tuple(courses_list) if courses_list else None)
+        aspect_df = build_aspect_table(tuple(texts_), tuple(courses_list) if courses_list else None)
 
         if not aspect_df.empty:
             overall_pivot = aspect_df.groupby(["Aspect", "Sentiment"]).size().unstack(fill_value=0)
