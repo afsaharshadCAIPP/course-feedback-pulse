@@ -38,9 +38,6 @@ NLLB_LANG_CODES = {
     "tr": "tur_Latn", "id": "ind_Latn", "vi": "vie_Latn", "nl": "nld_Latn",
 }
 
-# =============================================================
-# PAGE CONFIG
-# =============================================================
 st.set_page_config(
     page_title="Course Feedback Sentiment Analyzer",
     page_icon="🎓",
@@ -53,9 +50,6 @@ SENT_ORDER = ["POSITIVE", "NEUTRAL", "NEGATIVE"]
 SENT_EMOJI = {"POSITIVE": "😊", "NEUTRAL": "😐", "NEGATIVE": "😟"}
 SENT_DOT = {"POSITIVE": "🟢", "NEUTRAL": "🟡", "NEGATIVE": "🔴"}
 
-# =============================================================
-# GLOBAL STYLE
-# =============================================================
 st.markdown("""
 <style>
 .main-header { font-size: 1.9rem !important; color: #0F172A !important; font-weight: 800 !important; margin-bottom: 0.2rem !important; line-height: 1.25 !important; }
@@ -139,9 +133,6 @@ section[data-testid="stSidebar"] div.stButton > button[kind="primary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-# =============================================================
-# MODEL LOADING
-# =============================================================
 @st.cache_resource(show_spinner="Loading Logistic Regression model...")
 def load_models():
     models = {}
@@ -529,8 +520,6 @@ def extract_aspect_mentions(text):
 
 REVIEW_COL_CANDIDATES = ["feedback", "review", "reviews", "text", "comment", "comments",
                           "description", "student_feedback", "student review", "student_review"]
-COURSE_COL_CANDIDATES = ["course", "courseid", "course_id", "coursename", "course_name",
-                          "course title", "coursetitle", "course_title", "course name"]
 
 def detect_review_column(df):
     cols_lower = {c.lower().strip(): c for c in df.columns}
@@ -543,8 +532,8 @@ def detect_review_column(df):
     return max(obj_cols, key=lambda c: df[c].astype(str).str.len().mean())
 
 def detect_course_column(df, review_col):
-    cols_lower = {c.lower().strip(): c for c in df.columns}
-    for cand in COURSE_COL_CANDIDATES:
+    cols_lower = {str(c).lower().strip(): c for c in df.columns}
+    for cand in ["course name", "coursename", "course_name", "course title", "coursetitle", "course_title", "courseid", "course_id", "course"]:
         if cand in cols_lower:
             return cols_lower[cand]
     for c in df.columns:
@@ -760,9 +749,6 @@ def _apply_sample_feedback_to(choice_key, text_key):
             st.session_state[text_key] = SAMPLE_FEEDBACKS[choice]
     return _cb
 
-# =============================================================
-# VIEW: SINGLE REVIEW ANALYSIS
-# =============================================================
 if app_mode == "Single Review Analysis":
     render_hero()
     st.markdown('<p class="section-header">💬 Single Review Analysis</p>', unsafe_allow_html=True)
@@ -878,9 +864,6 @@ if app_mode == "Single Review Analysis":
 
     render_footer()
 
-# =============================================================
-# VIEW: CSV ANALYSIS
-# =============================================================
 elif app_mode == "CSV Analysis":
     render_hero()
     st.markdown('<p class="main-header">Batch CSV Sentiment Analysis</p>', unsafe_allow_html=True)
@@ -1016,7 +999,7 @@ elif app_mode == "CSV Analysis":
                 course_pivot["Overall Sentiment"] = course_pivot.apply(
                     lambda r: majority_sentiment(r["POSITIVE"], r["NEUTRAL"], r["NEGATIVE"]), axis=1)
                 course_summary = course_pivot.rename(
-                    columns={"POSITIVE": "Positive", "NEUTRAL": "Neutral", "NEGATIVE": "Negative"})
+                    columns={course_col: "Course", "POSITIVE": "Positive", "NEUTRAL": "Neutral", "NEGATIVE": "Negative"})
                 course_summary = course_summary[["Course", "Aspect", "Reviews", "Positive", "Neutral", "Negative", "Overall Sentiment"]]
 
                 course_options = sorted(course_summary["Course"].unique().tolist())
@@ -1044,12 +1027,9 @@ elif app_mode == "CSV Analysis":
 
     render_footer()
 
-# =============================================================
-# VIEW: ASPECT ANALYSIS
-# =============================================================
 elif app_mode == "Aspect Analysis":
     render_hero()
-    st.markdown('<p class="main-header">🔗 Aspect Analysis</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-header">🔗 Aspect Analysis</p>', unsafe_allow_html=True)
     st.caption("Identify important course-related aspects and their sentiment.")
 
     sample_col2, text_col2 = st.columns(2)
@@ -1070,12 +1050,9 @@ elif app_mode == "Aspect Analysis":
 
     render_footer()
 
-# =============================================================
-# VIEW: EXPLAINABLE AI
-# =============================================================
 elif app_mode == "Explainable AI (SHAP)":
     render_hero()
-    st.markdown('<p class="main-header">💡 Explainable AI (SHAP)</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-header">💡 Explainable AI (SHAP)</p>', unsafe_allow_html=True)
     st.caption("Understand which words influence the sentiment prediction.")
 
     sample_col3, text_col3 = st.columns(2)
@@ -1095,15 +1072,11 @@ elif app_mode == "Explainable AI (SHAP)":
 
     render_footer()
 
-# =============================================================
-# VIEW: MODEL PERFORMANCE
-# =============================================================
 elif app_mode == "Model Performance":
     render_hero()
-    st.markdown('<p class="main-header">📈 Model Performance</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-header">📈 Model Performance</p>', unsafe_allow_html=True)
     metrics = load_metrics_json()
     baseline = metrics.get("baseline")
-    distil = metrics.get("distilbert")
 
     if baseline:
         c1, c2 = st.columns(2)
@@ -1111,11 +1084,8 @@ elif app_mode == "Model Performance":
         c2.metric("Baseline Macro F1", f"{baseline['classification_report']['macro avg']['f1-score']*100:.1f}%")
     render_footer()
 
-# =============================================================
-# VIEW: ABOUT
-# =============================================================
 elif app_mode == "About":
     render_hero()
-    st.markdown('<p class="main-header">ℹ️ About This Project</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-header">ℹ️ About This Project</p>', unsafe_allow_html=True)
     st.write("Course Feedback Sentiment Analysis is an AI-powered educational analytics application.")
     render_footer()
