@@ -1025,7 +1025,6 @@ elif app_mode == "CSV Analysis":
                 st.dataframe(course_view, use_container_width=True, hide_index=True)
 
         st.markdown('<p class="section-header">📋 Analysis Results & Translations</p>', unsafe_allow_html=True)
-        TRANSLATE_LIMIT = len(work_df)
         preview_df = work_df.copy()
 
         lang_labels, translations = [], []
