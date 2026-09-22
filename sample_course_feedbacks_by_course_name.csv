@@ -1,0 +1,31 @@
+course_name,feedback_by,rating,feedback
+Python for Everybody,Student,5,The course was excellent and the instructor explained Python concepts very clearly.
+Python for Everybody,Learner,5,I really enjoyed the practical coding examples and exercises.
+Python for Everybody,Student,4,The lessons were well organized and easy to follow.
+Python for Everybody,Learner,3,"The course covered the basics adequately, although some topics needed more explanation."
+Python for Everybody,Student,2,Some programming concepts were difficult to understand because the explanations moved too quickly.
+Web Development Fundamentals,Student,5,"The course gave me a strong understanding of HTML, CSS, and web development."
+Web Development Fundamentals,Learner,5,The hands-on examples were very useful and made learning enjoyable.
+Web Development Fundamentals,Student,4,The content was informative and the projects helped me practice.
+Web Development Fundamentals,Learner,3,"The course was useful, but I expected more advanced projects."
+Web Development Fundamentals,Student,2,The course lacked enough practical exercises for beginners.
+UI/UX Design Principles,Student,5,The design principles were explained clearly with excellent visual examples.
+UI/UX Design Principles,Learner,5,I learned a lot about user experience and enjoyed creating the design exercises.
+UI/UX Design Principles,Student,4,The course was well structured and easy to understand.
+UI/UX Design Principles,Learner,3,"The course was informative, but some sections felt a little repetitive."
+UI/UX Design Principles,Student,2,I found some UX concepts confusing and needed additional resources.
+Data Science Fundamentals,Learner,5,The course provided a great introduction to data analysis and visualization.
+Data Science Fundamentals,Student,5,The examples were practical and helped me understand the concepts quickly.
+Data Science Fundamentals,Learner,4,The course covered the main topics effectively.
+Data Science Fundamentals,Student,3,"The content was useful, although the course could include more real-world datasets."
+Data Science Fundamentals,Learner,2,Some lessons contained too much information at once and were difficult to follow.
+Graphic Design Basics,Student,5,"The course was creative, engaging, and very easy to follow."
+Graphic Design Basics,Learner,5,I loved the design exercises and learned useful graphic design techniques.
+Graphic Design Basics,Student,4,The lessons were clear and the examples were helpful.
+Graphic Design Basics,Learner,3,The course was satisfactory but could have included more advanced design projects.
+Graphic Design Basics,Student,2,The explanations were sometimes unclear and the practical activities were limited.
+Artificial Intelligence Fundamentals,Student,5,The instructor made artificial intelligence concepts easy to understand.
+Artificial Intelligence Fundamentals,Learner,5,The course was engaging and gave me a useful foundation in AI.
+Artificial Intelligence Fundamentals,Student,4,The material was interesting and generally well presented.
+Artificial Intelligence Fundamentals,Learner,3,"The course was informative, but the pace was average and some topics were brief."
+Artificial Intelligence Fundamentals,Student,2,The technical concepts were challenging and some explanations needed more detail.
